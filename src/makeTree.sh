@@ -10,7 +10,7 @@ set -e
 
 zip=0
 #for all in HadronicDM-v1  Monojet-v1 VisibleZpDM-v1 VisiblehsDM-v1
-for all in Monojet-v1
+for all in test
 do
     for n in `ls ../samples/${all}/`
     do
