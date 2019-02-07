@@ -17,9 +17,10 @@ do
 	zip=1
 	name=$(basename $n .lhe.gz)
 	echo "Unzip $n..."
-	gunzip $n
+	gunzip --keep ../samples/$n
 	echo "Making Tree on $name..."
 	python lhe2root.py ../samples/$all/$name.lhe $name.root
+	rm ../samples/$all/$name.lhe
     elif [ ${n: -4} == ".lhe" ];then
 	name=$(basename $n .lhe)
 	echo "Making Tree on $name..."

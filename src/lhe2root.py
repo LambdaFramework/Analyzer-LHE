@@ -1,4 +1,4 @@
-#! /usr/bin/env pythonOA
+#! /usr/bin/env pythonAOA
 
 # Jim Henderson January 2013
 # James.Henderson@cern.ch
@@ -39,78 +39,32 @@ except:
 
 output_tree = TTree("Physics", "Physics")
 print "Setup complete \nOpened file " + str(sys.argv[1]) + "  \nConverting to .root format and outputing to " + output_file_name
-'''
-def sortpt1(TLV1,TLV2):
-    list=[]
-    if TLV1.Pt() > TLV2.Pt():
-        list.append(TLV1.Eta())
-        list.append(TLV2.Eta())
-    if TLV1.Pt() < TLV2.Pt():
-        list.append(TLV2.Eta())
-        list.append(TLV1.Eta())
-    return list
 
-def sortpt2(TLV1,TLV2):
-    list=[]
-    if TLV1.Pt() > TLV2.Pt():
-        list.append(TLV1.Rapidity())
-        list.append(TLV2.Rapidity())
-    if TLV1.Pt() < TLV2.Pt():
-        list.append(TLV2.Rapidity())
-        list.append(TLV1.Rapidity())
-    return list
-
-def sortpt3(TLV1,TLV2):
-    list=[]
-    if TLV1.Pt() > TLV2.Pt():
-        list.append(TLV1.Phi())
-        list.append(TLV2.Phi())
-    if TLV1.Pt() < TLV2.Pt():
-        list.append(TLV2.Phi())
-        list.append(TLV1.Phi())
-    return list
-'''
 # Setup output branches, a vector
-zp = r.vector('TLorentzVector')()
-hs = r.vector('TLorentzVector')()
-chi_plus = r.vector('TLorentzVector')()
-chi_minus = r.vector('TLorentzVector')()
-DMsystem = r.vector('TLorentzVector')()
-lightjet1 = r.vector('TLorentzVector')()
-lightjet2 = r.vector('TLorentzVector')()
-lightjet3 = r.vector('TLorentzVector')()
-bjet1 = r.vector('TLorentzVector')()
-bjet2 = r.vector('TLorentzVector')()
-bjet3 = r.vector('TLorentzVector')()
-dijet12 = r.vector('TLorentzVector')()
-dibjet12 = r.vector('TLorentzVector')()
+leptons = r.vector('TLorentzVector')()
+neutrinos = r.vector('TLorentzVector')()
+quarks = r.vector('TLorentzVector')()
+WBoson = r.vector('TLorentzVector')()
+Higgs = r.vector('TLorentzVector')()
+InVhiggs = r.vector('TLorentzVector')()
 
-output_tree.Branch("zp",zp)
-output_tree.Branch("hs",hs)
-output_tree.Branch("chi_plus",chi_plus)
-output_tree.Branch("chi_minus",chi_minus)
-output_tree.Branch("DMsystem",DMsystem)
-output_tree.Branch("lightjet1",lightjet1)
-output_tree.Branch("lightjet2",lightjet2)
-output_tree.Branch("lightjet3",lightjet3)
-output_tree.Branch("bjet1",bjet1)
-output_tree.Branch("bjet2",bjet2)
-output_tree.Branch("bjet3",bjet3)
-output_tree.Branch("dijet12",dijet12)
-output_tree.Branch("dibjet12",dibjet12)
+output_tree.Branch("leptons",leptons)
+output_tree.Branch("neutrinos",neutrinos)
+output_tree.Branch("quarks",quarks)
+output_tree.Branch("WBoson",WBoson)
+output_tree.Branch("Higgs",Higgs)
+output_tree.Branch("InVhiggs",InVhiggs)
 
 #TLorentzVector
-DM = TLorentzVector()
-DIJET = TLorentzVector()
-DIBJET = TLorentzVector()
-#vector dummy
-#DUMMY = r.vector('TLorentzVector')()
-DUMMY=[]
-BDUMMY=[]
+invhiggs = TLorentzVector()
+lepton=[]
+quark=[]
+neutrino=[]
+Wboson=[]
 
 #Comparator
 def getPt(TLorentzVector):
-    return TLorentzVector[0].Pt()
+    return TLorentzVector.Pt()
 
 ############################################################################
 # Create a struct which acts as the TBranch for non-vectors
@@ -147,6 +101,8 @@ xsec_count = 0
 chi = 0
 matching=False
 
+Leps=[11,-11,13,-13,15,-15]
+Neus=[12,-12,14,-14,16,-16]
 lightquarks=[21,1,2,3,4,-1,-2,-3,-4]
 bquarks=[-5,5]
 
@@ -219,71 +175,38 @@ for line in input_file:
         if DEBUG: print "Step4: Finalizing variable storing"
 
         #sort jet in descending pt
-        DUMMY.sort(key=getPt, reverse=True)
-        #BDUMMY.sort(key=getPt, reverse=True)
-
-        #if jetiness>1 and DUMMY[0][1] is in lightquarks:
-        #    lightjet1.push_back(DUMMY[0][0])
-        #if jetiness==2 and DUMMY[1][1] is in lightquarks:
-        #    lightjet2.push_back(DUMMY[1][0])
-        #if jetiness==3 and DUMMY[2][1] is in lightquarks:
-        #    lightjet3.push_back(DUMMY[2][0])
-
-        #    DIJET= DUMMY[0][0]+ DUMMY[1][0]
-        #    dijet12.push_back( DIJET )
-        b1isfilled=False
-        lj1isfilled=False
-        for jetty in range(0,len(BDUMMY)):
-            if BDUMMY[jetty][1] in bquarks:
-                if not b1isfilled:
-                    bjet1.push_back(BDUMMY[jetty][0])
-                    DIBJET=BDUMMY[jetty][0]
-                    b1isfilled=True
-                elif b1isfilled:
-                    bjet2.push_back(BDUMMY[jetty][0])
-                    DIBJET+=BDUMMY[jetty][0]
-                    dibjet12.push_back( DIBJET )
-                if jetty==2:
-                    bjet3.push_back(BDUMMY[jetty][0])
-            elif BDUMMY[jetty][1] in lightquarks:
-                if not lj1isfilled:
-                    lightjet1.push_back(BDUMMY[jetty][0])
-                    DIJET=BDUMMY[jetty][0]
-                    lj1isfilled=True
-                elif lj1isfilled:
-                    lightjet2.push_back(BDUMMY[jetty][0])
-                    DIJET+=BDUMMY[jetty][0]
-                    dijet12.push_back( DIJET )
-                if jetty==2:
-                    lightjet3.push_back(BDUMMY[jetty][0])
-                
-        DMsystem.push_back( DM )
+        lepton.sort(key=getPt, reverse=True)
+        neutrino.sort(key=getPt, reverse=True)
+        quark.sort(key=getPt, reverse=True)
+        Wboson.sort(key=getPt, reverse=True)
+        
+        for ilepton in lepton:
+            leptons.push_back(ilepton)
+        for ineutrino in neutrino:
+            neutrinos.push_back(ineutrino)
+        for iquark in quark:
+            quarks.push_back(iquark)
+        for iwboson in Wboson:
+            WBoson.push_back(iwboson)
+        #Invariant
+        invhiggs= quark[0]+quark[1]+lepton[1]
+        InVhiggs.push_back(invhiggs)
         s.njet = jetiness
         output_tree.Fill()
         # Reset variables
         s.n_particles = 0
         s.weight = 0
         s.njet = 0
-        zp.clear()
-        hs.clear()
-        chi_plus.clear()
-        chi_minus.clear()
-        DMsystem.clear()
-        dijet12.clear()
-        dibjet12.clear()
-        lightjet1.clear()
-        lightjet2.clear()
-        lightjet3.clear()
-        bjet1.clear()
-        bjet2.clear()
-        bjet3.clear()
-        DM.SetPxPyPzE(0.,0.,0.,0.)
-        DIJET.SetPxPyPzE(0.,0.,0.,0.)
-        DIBJET.SetPxPyPzE(0.,0.,0.,0.)
-        del DUMMY[:]
-        del BDUMMY[:]
+        
+        leptons.clear()
+        neutrinos.clear()
+        quarks.clear()
+        WBoson.clear()
+        Higgs.clear()
+        InVhiggs.clear()
+        invhiggs.SetPxPyPzE(0.,0.,0.,0.)
+        del lepton[:];del neutrino[:];del quark[:];del Wboson[:]
         in_ev = 0
-        chi = 0
         continue
 
     # step 3
@@ -295,28 +218,18 @@ for line in input_file:
         try:
             if line.split()[1] is "1" or line.split()[1] is "2": # particle status
                 p = TLorentzVector( float(line.split()[6]), float(line.split()[7]), float(line.split()[8]), float(line.split()[9]) )
-                
-                if int(line.split()[0]) == 55: zp.push_back( p ); #zp
-                if int(line.split()[0]) == 54: hs.push_back( p ); #hs
-                if int(line.split()[0]) == 52: 
-                    chi+=1
-                    if chi==1:
-                        chi_plus.push_back( p )
-                    elif chi==2:
-                        chi_minus.push_back( p )
-                    DM+=p
 
-                if int(line.split()[0]) in lightquarks or int(line.split()[0]) in bquarks:
+                if int(line.split()[0]) in Leps:
+                    lepton.append(p)
+                if int(line.split()[0]) in Neus:
+                    neutrino.append(p)
+                if int(line.split()[0]) in lightquarks:
                     jetiness+=1
-                    if int(line.split()[0]) in lightquarks or int(line.split()[0]) in bquarks:
-                        BDUMMY.append( [p,int(line.split()[0])] )
-                    #if jetiness==1:
-                    #    lightjet1.push_back( p ); DIJET+=p
-                    #if jetiness==2:
-                    #    lightjet2.push_back( p ); DIJET+=p
-                    #if jetiness==3:
-                    #    lightjet3.push_back( p )
-                    #    pass
+                    quark.append(p)
+                if int(line.split()[0])==25:
+                    Higgs.push_back(p)
+                if int(line.split()[0]) in [24,-24]:
+                    Wboson.append(p)
                     pass
                 pass
             pass
