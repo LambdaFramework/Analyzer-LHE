@@ -2,8 +2,9 @@
 LHE Analyzer Padova
 
 ```
-cd src
 source setup.sh
+# Make Ntuple
 ./makeTree.sh
-python makePlots.py 
+# Plot Ntuple
+python plotter.py 
 ```
