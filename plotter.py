@@ -7,18 +7,21 @@ import math
 import ROOT
 from array import array
 from ROOT import gROOT, gRandom, AddressOf
-from ROOT import TFile, TTree, TCut, TH1F, THStack, TLeaf, TGraph
+from ROOT import TFile, TTree, TCut, TH1F, THStack, TLeaf, TGraph, TH2F
 from ROOT import TStyle, TCanvas, TPad
 from ROOT import TLegend, TLatex, TText
 import os, multiprocessing
 
+from variables import var2
+
 gROOT.Macro('functions.C')
 
-colour = [ 798, 418, 801, 881, 856, 6, 13, 46, 100, 7, 800 ]
+#colour = [ 798, 418, 801, 881, 856, 6, 13, 46, 100, 7, 800 ]
+colour = [8]
 
 dir=os.environ["ldir"]
 input= dir + "/Ntuples/"
-output= dir + "/Plots/"
+output= dir + "/plots/"
 
 def drawCMS(lumi, text, onTop=False):
     latex = TLatex()
@@ -47,7 +50,9 @@ def drawlabel(xposition,yposition,text):
     latex.DrawLatex( float(xposition) , float(yposition) , text )
 
 
-def plot(sample, n, v, hbins, hmin, hmax, hlog, xlabel, ylabel):
+def plot( sample, n, v, sel, hbins, hmin, hmax, hlog, xlabel, ylabel, dim ):
+
+    #hlog=False;
 
     global output
     file = {}
@@ -55,7 +60,7 @@ def plot(sample, n, v, hbins, hmin, hmax, hlog, xlabel, ylabel):
     hist = {}
     leaf = {}
     xsec = {}
-    
+
     max = 0
     min = 1e99
 
@@ -65,90 +70,97 @@ def plot(sample, n, v, hbins, hmin, hmax, hlog, xlabel, ylabel):
     for i, s in enumerate(sample):
         file[s] = TFile( input + s + ".root", "READ")
         tree[s] = file[s].Get("Physics")
-        hist[s] = TH1F(s, ";"+v, hbins, hmin , hmax)
-        tree[s].Project(s, v, "")
-        
-        leaf[s] = tree[s].GetLeaf("xsec1")
-        leaf[s].GetBranch().GetEntry(1)
-        xsec[s] = leaf[s].GetValue()
-        hist[s].SetLineColor(colour[i])
+        if dim==1:
+            hist[s] = TH1F(s, ";"+v, hbins, hmin , hmax)
+            tree[s].Project(s, v, "%s"%sel)
 
-        hist[s].SetLineWidth(2)#3                                                                                                                                                    
-        hist[s].SetFillColorAlpha(colour[i],0.35)
-        hist[s].SetFillStyle(3005)
+            leaf[s] = tree[s].GetLeaf("xsec1")
+            leaf[s].GetBranch().GetEntry(1)
+            xsec[s] = leaf[s].GetValue()
+            hist[s].SetLineColor(colour[i])
+            
+            hist[s].SetLineWidth(2)#3
+            hist[s].SetFillColorAlpha(colour[i],0.35)
+            hist[s].SetFillStyle(3005)
 
-        if hist[s].GetMaximum() > max: max = hist[s].GetMaximum()*6
-        if hist[s].GetMinimum() < min: min = hist[s].GetMinimum()
+            if hist[s].GetMaximum() > max: max = hist[s].GetMaximum()*6
+	    if hist[s].GetMinimum() < min: min = hist[s].GetMinimum()
 
-        #leg = TLegend(0.4, 0.9-0.035*len(sample), 0.68, 0.89)
+            #leg = TLegend(0.4, 0.9-0.035*len(sample), 0.68, 0.89)
 
-        c1 = TCanvas("c1", "Gen", 1600, 1200)
-        c1.cd()
+            c1 = TCanvas("c1", "Gen", 1600, 1200)
+            c1.cd()
+            
+            hist[sample[0]].SetMaximum(max*1.2)
+            hist[sample[0]].SetMinimum(min+1.e6)
 
-        hist[sample[0]].SetMaximum(max*1.2)
-        hist[sample[0]].SetMinimum(min+1.e6)
+            hist[sample[0]].GetXaxis().SetTitle("%s" %xlabel)
+            hist[sample[0]].GetYaxis().SetTitle("%s" %ylabel)
+            hist[sample[0]].SetTitle("%s" %n)
 
-        hist[sample[0]].GetXaxis().SetTitle("%s" %xlabel)
-        hist[sample[0]].GetYaxis().SetTitle("%s" %ylabel)
-        hist[sample[0]].SetTitle("%s" %n)
+            if len(sample)>1:
+                for i, s in enumerate(sample):
+                    hist[s].Draw("HIST" if i==0 else "HIST, SAME")
+            else:
+                hist[s].Draw("HIST")
+                
+            if hlog:
+                c1.GetPad(0).SetLogy()
+                
+        elif dim==2:
+            if len(hbins)!=2 or len(hmin)!=2 or len(hmax)!=2:
+                print "dimension of hbins, hmin, hmax does not correspond to\
+                2 dimensional histogram parameters."; exit;
+            else:
+                #X axis parameters follow by Y axis parameters
+                hist[s] = TH2F( s, ";"+v, hbins[0], hmin[0] , hmax[0], hbins[1], hmin[1] , hmax[1] )
+                # v in the form of x:y
+                tree[s].Project(s, v, "%s"%sel,"colz")
 
-        if len(sample)>1:
-            for i, s in enumerate(sample):
-                hist[s].Draw("HIST" if i==0 else "HIST, SAME")
+                c1 = TCanvas("c1", "Gen", 1600, 1200)
+                c1.cd()
+
+                hist[s].Draw("COLZ")
+                #if hlog:
+                #    c1.GetPad(0).SetLogy()
+                #    c1.GetPad(0).SetLogx()
         else:
-            hist[s].Draw("HIST")
-
-        if hlog:
-            c1.GetPad(0).SetLogy()
+            print "Unkown dimension"
+            exit;
 
         #leg.Draw()
-        #c1.Update()
+        c1.Update()
 
         drawlabel( 0.37 , 0.934 , "CMS Simulation" )
 
-        output+="VH/"
+        output+="VH/"+sample[0]+"/"
+        if not hlog:
+            output+="Lin/"
+        elif hlog:
+            output+="Log/"
+        
         if not os.path.exists(output):
             os.makedirs(output)
+
         c1.Print( output + n + ".pdf")
         c1.Print( output + n + ".png")
+            
 ###################
 
+def Run(lhes):
+    for v in var2:
+        p = multiprocessing.Process( target=plot, args=([lhe],v[0],v[1],v[2],v[3],v[4],v[5],v[6],v[7],v[8],v[9]) )
+        p.start()
+        
 #Variables
 NORM2AU=False
-
-var = [
-    #lepton                                                                                                                                                                          
-    ["lep1_Pt","leptons[0].Pt()", 40, 0., 600., True, "P_{t}(lep1) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{d#sigma}{dPt}"],
-    ["lep1_Eta","leptons[0].Eta()",  50, -5., 5., True, "#eta(lep1) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{d#sigma}{d#eta}"],
-    ["lep1_Phi","leptons[0].Phi()", 28 , 0. , 3.15, True, "#Phi(lep1) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{d#sigma}{d#Phi}"],
-    
-    ["lep2_Pt","leptons[1].Pt()", 40, 0., 600., True, "P_{t}(lep2) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{d#sigma}{dPt}"],
-    ["lep2_Eta","leptons[1].Eta()",  50, -5., 5., True, "#eta(lep2) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{d#sigma}{d#eta}"],
-    ["lep2_Phi","leptons[1].Phi()", 28 , 0. , 3.15, True, "#Phi(lep2) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{d#sigma}{d#Phi}"],
-
-    ["lep3_Pt","leptons[2].Pt()", 40, 0., 600., True, "P_{t}(lep3) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{d#sigma}{dPt}"],
-    ["lep3_Eta","leptons[2].Eta()",  50, -5., 5., True, "#eta(lep3) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{d#sigma}{d#eta}"],
-    ["lep3_Phi","leptons[2].Phi()", 28 , 0. , 3.15, True, "#Phi(lep3) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{d#sigma}{d#Phi}"],
-
-    ["lep_dPhi","deltaPhi(leptons[0].Phi(),leptons[1].Phi())" , 28 , 0. , 3.15 , True, "DeltaPhi(l1l2)", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{d#sigma}{d#Delta#eta}" ],
-    ["lep_dR", "deltaR(leptons[0].Phi(),leptons[0].Eta(),leptons[1].Phi(),leptons[1].Eta())" , 60 , 0. , 5 , True, "DeltaR(l1l2)", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{d#sigma}{d#DeltaR}" ],
-
-    #Jet multiplicity                                                                                                                                                                
-    ["Njet","njet", 10, -0.5, 9.5, True, "Jet Multiplicity", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{d#sigma}{dn}"],
-    
-    #Counter                                                                                                                                                                         
-    ["Nparticle","n_particles", 10, -0.5, 9.5, True, "Number of Particle in Events", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{d#sigma}{dn}"],
-
-    #InvLepjj                                                                                                                                                                        
-    ["InvLepjj","InvLepjj.M()", 50, 0, 200, True, "Invariant mass of lepton + j j ", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{d#sigma}{dn}"],
-]
 
 #Samples -> NAME.root
 ## Multiple Root file draw on same canvas
 #WhWW=["wphwwlvjj","wmhwwlvjj"] #NAME
 ## Single Root file draw on same canvas
-WhWW=["wphwwlvjj"]
+#WhWW=["wmhwwlvjj"]
+Lhefiles=["wmhwwlvjj","wphwwlvjj"]
 
-for v in var:
-    p = multiprocessing.Process( target=plot, args=(WhWW,v[0],v[1],v[2],v[3],v[4],v[5],v[6],v[7]) )
-    p.start()
+for lhe in Lhefiles:
+    Run(lhe);
