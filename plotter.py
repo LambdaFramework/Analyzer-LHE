@@ -160,7 +160,7 @@ NORM2AU=False
 #WhWW=["wphwwlvjj","wmhwwlvjj"] #NAME
 ## Single Root file draw on same canvas
 #WhWW=["wmhwwlvjj"]
-Lhefiles=["wmhwwlvjj","wphwwlvjj"]
+Lhefiles=["Wminushwwlvjj_012j_M125_LO_MLM_13TeV","Wplushwwlvjj_012j_M125_LO_MLM_13TeV"]
 
 for lhe in Lhefiles:
     Run(lhe);

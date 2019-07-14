@@ -3,38 +3,38 @@ NORM2AU=False
 
 var2 =  [
     #Electron
-    ["Elec1_Pt","L1[0].Pt()","abs(L1CH[0])==11",40, 0., 600., True, "P_{t}(e1) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{dPt}",1],
+    ["Elec1_Pt","L1[0].Pt()","abs(L1CH[0])==11",60, 0., 600., True, "P_{t}(e1) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{dPt}",1],
     ["Elec1_Eta","L1[0].Eta()","abs(L1CH[0])==11",50, -5., 5., True, "#eta(e1)", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{d#eta}",1],
     ["Elec1_Phi","L1[0].Phi()","abs(L1CH[0])==11",28 , 0. , 3.15, True, "#Phi(e1)", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{d#Phi}",1],
 
-    ["Elec2_Pt","L2[0].Pt()","abs(L2CH[0])==11",40, 0., 600., True, "P_{t}(e2) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{dPt}",1],
+    ["Elec2_Pt","L2[0].Pt()","abs(L2CH[0])==11",60, 0., 600., True, "P_{t}(e2) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{dPt}",1],
     ["Elec2_Eta","L2[0].Eta()","abs(L2CH[0])==11",50, -5., 5., True, "#eta(e2)", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{d#eta}",1],
     ["Elec2_Phi","L2[0].Phi()","abs(L2CH[0])==11",28 , 0. , 3.15, True, "#Phi(e2)", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{d#Phi}",1],
 
     #Muon
-    ["Mu1_Pt","L1[0].Pt()","abs(L1CH[0])==13",40, 0., 600., True, "P_{t}(mu1) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{dPt}",1],
+    ["Mu1_Pt","L1[0].Pt()","abs(L1CH[0])==13",120, 0., 600., True, "P_{t}(mu1) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{dPt}",1],
     ["Mu1_Eta","L1[0].Eta()","abs(L1CH[0])==13",50, -5., 5., True, "#eta(mu1)", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{d#eta}",1],
     ["Mu1_Phi","L1[0].Phi()","abs(L1CH[0])==13",28 , 0. , 3.15, True, "#Phi(mu1)", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{d#Phi}",1],
 
-    ["Mu2_Pt","L2[0].Pt()","abs(L2CH[0])==13",40, 0., 600., True, "P_{t}(mu2) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{dPt}",1],
+    ["Mu2_Pt","L2[0].Pt()","abs(L2CH[0])==13",120, 0., 600., True, "P_{t}(mu2) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{dPt}",1],
     ["Mu2_Eta","L2[0].Eta()","abs(L2CH[0])==13",50, -5., 5., True, "#eta(mu2)", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{d#eta}",1],
     ["Mu2_Phi","L2[0].Phi()","abs(L2CH[0])==13",28 , 0. , 3.15, True, "#Phi(mu2)", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{d#Phi}",1],
 
     #electron neutrino
-    ["ve1_Pt","v1[0].Pt()","abs(v1CH[0])==12",40, 0., 600., True, "P_{t}(ve1) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{dPt}",1],
+    ["ve1_Pt","v1[0].Pt()","abs(v1CH[0])==12",60, 0., 600., True, "P_{t}(ve1) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{dPt}",1],
     ["ve1_Eta","v1[0].Eta()","abs(v1CH[0])==12",50, -5., 5., True, "#eta(ve1)", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{d#eta}",1],
     ["ve1_Phi","v1[0].Phi()","abs(v1CH[0])==12",28 , 0. , 3.15, True, "#Phi(ve1)", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{d#Phi}",1],
 
-    ["ve2_Pt","v2[0].Pt()","abs(v2CH[0])==12",40, 0., 600., True, "P_{t}(ve2) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{dPt}",1],
+    ["ve2_Pt","v2[0].Pt()","abs(v2CH[0])==12",60, 0., 600., True, "P_{t}(ve2) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{dPt}",1],
     ["ve2_Eta","v2[0].Eta()","abs(v2CH[0])==12",50, -5., 5., True, "#eta(ve2)", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{d#eta}",1],
     ["ve2_Phi","v2[0].Phi()","abs(v2CH[0])==12",28 , 0. , 3.15, True, "#Phi(ve2)", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{d#Phi}",1],
 
     #muon neutrino
-    ["vmu1_Pt","v1[0].Pt()","abs(v1CH[0])==14",40, 0., 600., True, "P_{t}(vmu1) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{dPt}",1],
+    ["vmu1_Pt","v1[0].Pt()","abs(v1CH[0])==14",60, 0., 600., True, "P_{t}(vmu1) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{dPt}",1],
     ["vmu1_Eta","v1[0].Eta()","abs(v1CH[0])==14",50, -5., 5., True, "#eta(vmu1)", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{d#eta}",1],
     ["vmu1_Phi","v1[0].Phi()","abs(v1CH[0])==14",28 , 0. , 3.15, True, "#Phi(vmu1)", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{d#Phi}",1],
 
-    ["vmu2_Pt","v2[0].Pt()","abs(v2CH[0])==14",40, 0., 600., True, "P_{t}(vmu2) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{dPt}",1],
+    ["vmu2_Pt","v2[0].Pt()","abs(v2CH[0])==14",60, 0., 600., True, "P_{t}(vmu2) [GeV]", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{dPt}",1],
     ["vmu2_Eta","v2[0].Eta()","abs(v2CH[0])==14",50, -5., 5., True, "#eta(vmu2)", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{d#eta}",1],
     ["vmu2_Phi","v2[0].Phi()","abs(v2CH[0])==14",28 , 0. , 3.15, True, "#Phi(vmu2)", "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{d#Phi}",1],
 
