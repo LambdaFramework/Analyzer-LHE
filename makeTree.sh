@@ -1,18 +1,23 @@
 #!/bin/bash
 
+lheDir='LHE/'
+
 set -e
 
-for n in `ls Events/`
+for n in `ls $lheDir`
 do
     echo $n
     if [ ${n: -7} == ".lhe.gz" ];then
 	name=$(basename $n .lhe.gz)
 	echo "Unzip $n..."
-	gunzip --keep Events/$n
+	gunzip --keep ${lheDir}/$n
 	echo "Making Tree on $name..."
-	python ntupler.py Events/$name.lhe Ntuples/$name.root
-	rm Events/$name.lhe
+	python ntupler.py ${lheDir}/$name.lhe Ntuples/$name.root
+	rm ${lheDir}/$name.lhe
     else
-	continue
+	name=$(basename $n .lhe)
+	echo "Making Tree on $name..."
+	python ntupler.py ${lheDir}/$name.lhe Ntuples/$name.root
+	echo "Done"
     fi
 done
