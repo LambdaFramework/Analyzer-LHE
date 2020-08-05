@@ -12,16 +12,14 @@ from ROOT import TStyle, TCanvas, TPad
 from ROOT import TLegend, TLatex, TText
 import os, multiprocessing
 
-from variables import var2
+cwd = os.getcwd()
+inputs= "%s/../ntupler/Ntuples/" %cwd
+output= "%s/plots/" %cwd
 
 gROOT.Macro('functions.C')
 
 #colour = [ 798, 418, 801, 881, 856, 6, 13, 46, 100, 7, 800 ]
 colour = [8]
-
-dir=os.environ["ldir"]
-input= dir + "/Ntuples/"
-output= dir + "/plots/"
 
 def drawCMS(lumi, text, onTop=False):
     latex = TLatex()
@@ -68,7 +66,7 @@ def plot( sample, n, v, sel, hbins, hmin, hmax, hlog, xlabel, ylabel, dim ):
     ROOT.gROOT.SetBatch(True)
 
     for i, s in enumerate(sample):
-        file[s] = TFile( input + s + ".root", "READ")
+        file[s] = TFile( inputs + s + ".root" , "READ")
         tree[s] = file[s].Get("Physics")
         if dim==1:
             hist[s] = TH1F(s, ";"+v, hbins, hmin , hmax)
@@ -133,34 +131,16 @@ def plot( sample, n, v, sel, hbins, hmin, hmax, hlog, xlabel, ylabel, dim ):
 
         drawlabel( 0.37 , 0.934 , "CMS Simulation" )
 
-        output+="VH/"+sample[0]+"/"
+        output+="/"+sample[0]+"/"
         if not hlog:
             output+="Lin/"
         elif hlog:
             output+="Log/"
         
         if not os.path.exists(output):
-            os.makedirs(output)
+            os.system('mkdir -p %s' %output)
 
         c1.Print( output + n + ".pdf")
         c1.Print( output + n + ".png")
             
 ###################
-
-def Run(lhes):
-    for v in var2:
-        p = multiprocessing.Process( target=plot, args=([lhe],v[0],v[1],v[2],v[3],v[4],v[5],v[6],v[7],v[8],v[9]) )
-        p.start()
-        
-#Variables
-NORM2AU=False
-
-#Samples -> NAME.root
-## Multiple Root file draw on same canvas
-#WhWW=["wphwwlvjj","wmhwwlvjj"] #NAME
-## Single Root file draw on same canvas
-#WhWW=["wmhwwlvjj"]
-Lhefiles=["Wminushwwlvjj_012j_M125_LO_MLM_13TeV","Wplushwwlvjj_012j_M125_LO_MLM_13TeV"]
-
-for lhe in Lhefiles:
-    Run(lhe);

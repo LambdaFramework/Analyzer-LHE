@@ -156,3 +156,5 @@ var2 =  [
     ["2D_lep1v1_dPhi_W1Pt","deltaPhi(L1[0].Phi(),v1[0].Phi()):W1[0].Pt()" ,"",[28,40] , [0.,0.] , [3.15,600] , True, "deltaphi lep1v1 : W1", "A.U." if NORM2AU else "#frac{1}{#sigma} #\frac{dN}{d#Delta#eta}",2],
     ["2D_W1pt_Hpt","W1[0].Pt():Higgs[0].Pt()" ,"",[40,40] , [0.,0.] , [600,600] , True, "W1[0].Pt():Higgs[0].Pt()", "A.U." if NORM2AU else "#frac{1}{#sigma} #\frac{dN}{d#Delta#eta}",2],
 ]
+
+var = 
