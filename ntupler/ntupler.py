@@ -46,11 +46,19 @@ def getPt(TLorentzList):
 def getPt1(TLorentzList):
     return TLorentzList[1].Pt()
 
-def TLorentzOperation( TLorentzList , TLorentzVector, TLorentzVectorID=None ):
+def TLorentzOperation( TLorentzList , TLorentzVector, TLorentzVectorID=None , TLorentzVectorMother=None ):
     TLorentzList.sort( key= getPt1 if TLorentzVectorID is not None  else getPt, reverse=True)
-    if TLorentzVectorID is not None:
-        for ivec in TLorentzList: TLorentzVectorID.push_back(ivec[0])
-        for ivec in TLorentzList: TLorentzVector.push_back(ivec[1])
+    
+    if TLorentzVectorID is not None :
+        if TLorentzVectorMother is None :
+            for ivec in TLorentzList:
+                TLorentzVectorID.push_back(ivec[0])
+                TLorentzVector.push_back(ivec[1])
+        elif TLorentzVectorMother is not None :
+            for ivec in TLorentzList:
+                TLorentzVectorID.push_back(ivec[0])
+                TLorentzVector.push_back(ivec[1])
+                TLorentzVectorMother.push_back(ivec[2])
     else:
         for ivec in TLorentzList: TLorentzVector.push_back(ivec)
 
@@ -69,21 +77,61 @@ bQuarks=[-5,5]
 # branch declaration (vector)
 
 leptons = r.vector('TLorentzVector')()
+l1v1 = r.vector('TLorentzVector')()
+l2v2 = r.vector('TLorentzVector')()
 leptons_pdgId = r.vector('int')()
+leptons_w1 = r.vector('int')()
+
 neutrinos = r.vector('TLorentzVector')()
+neutrinos_pdgId = r.vector('int')()
+neutrinos_w1 = r.vector('int')()
+
 wbosons = r.vector('TLorentzVector')()
+wbosons_pdgId = r.vector('int')()
+wbosons_w1 = r.vector('int')()
+
 higgs = r.vector('TLorentzVector')()
+
 quarks = r.vector('TLorentzVector')()
-radiations = r.vector('int')() # -1 , 1
+radiations = r.vector('int')() # -1 or 1
+jj = r.vector('TLorentzVector')()
+ht = r.vector('TLorentzVector')()
+jjl2v2 = r.vector('TLorentzVector')()
+jjl1v1 = r.vector('TLorentzVector')()
+mjjll = r.vector('TLorentzVector')()
+jjl1 = r.vector('TLorentzVector')()
+jjl2 = r.vector('TLorentzVector')()
+v1v2 = r.vector('TLorentzVector')()
+
 bquarks = r.vector('TLorentzVector')()
 
 output_tree.Branch("leptons",leptons)
+output_tree.Branch("l1v1",l1v1)
+output_tree.Branch("l2v2",l2v2)
 output_tree.Branch("leptons_pdgId",leptons_pdgId)
+output_tree.Branch("leptons_w1",leptons_w1)
+
 output_tree.Branch("neutrinos",neutrinos)
+output_tree.Branch("neutrinos_pdgId",neutrinos_pdgId)
+output_tree.Branch("neutrinos_w1",neutrinos_w1)
+
 output_tree.Branch("wbosons",wbosons)
+output_tree.Branch("wbosons_pdgId",wbosons_pdgId)
+output_tree.Branch("wbosons_w1",wbosons_w1)
+
 output_tree.Branch("higgs",higgs)
+
 output_tree.Branch("quarks",quarks)
 output_tree.Branch("radiations",radiations)
+output_tree.Branch("jj",jj)
+output_tree.Branch("ht",ht)
+output_tree.Branch("jjl2v2",jjl2v2)
+output_tree.Branch("jjl1v1",jjl1v1)
+output_tree.Branch("mjjll",mjjll)
+output_tree.Branch("jjl1",jjl1)
+output_tree.Branch("jjl2",jjl2)
+output_tree.Branch("v1v2",v1v2)
+
 output_tree.Branch("bquarks",bquarks)
 
 # ************************************************************************
@@ -193,14 +241,12 @@ for line in input_file:
             pdgid = int(spline[0]) ; state = int(spline[1]) ; mom1 = int(spline[2]) ; mom2 = int(spline[3])
 	    p4 = TLorentzVector( float(spline[6]), float(spline[7]), float(spline[8]), float(spline[9]) )
         
-	    if pdgid in Leptons :
-                if abs(pdgid) == 11 : leptons_.append([ pdgid , p4])
-                elif abs(pdgid) == 13 : leptons_.append([ pdgid , p4])
-        
-	    if pdgid in Neutrinos : neutrinos_.append(p4)
-            if pdgid in Wbosons   : wbosons_.append(p4)
+	    if pdgid in Leptons   : leptons_.append([ pdgid , p4 , mom1 ])        
+	    if pdgid in Neutrinos : neutrinos_.append([ pdgid , p4 , mom1 ])
+            if pdgid in Wbosons   : wbosons_.append([ pdgid , p4 , mom1 ])
             if pdgid in Quarks    :
                 s.njet+=1
+                # -1 is not ISR/FSR
                 quarks_.append([ -1 if mom1 in [4,5,6] else 1 , p4] )
             if pdgid in Higgs     : higgs_.append(p4)
             if pdgid in bQuarks   : bquarks_.append(p4)
@@ -221,12 +267,27 @@ for line in input_file:
         if DEBUG: print "Step3 : End with </event>"
         
         # sort particle in descending pt order
-        TLorentzOperation( leptons_ , leptons , leptons_pdgId )
-        TLorentzOperation( neutrinos_ , neutrinos )
+        TLorentzOperation( leptons_ , leptons , leptons_pdgId , leptons_w1 )
+        TLorentzOperation( neutrinos_ , neutrinos , neutrinos_pdgId , neutrinos_w1 )
         TLorentzOperation( higgs_ , higgs )
-        TLorentzOperation( wbosons_ , wbosons )
+        TLorentzOperation( wbosons_ , wbosons , wbosons_pdgId , wbosons_w1 )
         TLorentzOperation( quarks_ , quarks , radiations )
         TLorentzOperation( bquarks_ , bquarks )
+
+        #ht
+        htsum = TLorentzVector(0.,0.,0.,0.);
+        for ijet in quarks: htsum+=ijet;
+        ht.push_back(htsum);
+
+        l1v1.push_back(leptons[0]+neutrinos[0])
+        l2v2.push_back(leptons[1]+neutrinos[1])
+        jj.push_back((quarks[0]+quarks[1]))
+        jjl2v2.push_back((quarks[0]+quarks[1]+leptons[1]+neutrinos[1]))
+        jjl1v1.push_back((quarks[0]+quarks[1]+leptons[0]+neutrinos[0]))
+        mjjll.push_back((quarks[0]+quarks[1]+leptons[1]+leptons[1]))
+        jjl1.push_back((quarks[0]+quarks[1]+leptons[0]))
+        jjl2.push_back((quarks[0]+quarks[1]+leptons[1]))
+        v1v2.push_back((neutrinos[0]+neutrinos[1]))
         
         output_tree.Fill()
 
@@ -250,12 +311,27 @@ for line in input_file:
         bquarks_=[]
         
         leptons.clear()
+        l1v1.clear()
+        l2v2.clear()
         leptons_pdgId.clear()
+        leptons_w1.clear()
         neutrinos.clear()
+        neutrinos_pdgId.clear()
+        neutrinos_w1.clear()
         higgs.clear()
         wbosons.clear()
+        wbosons_pdgId.clear()
+        wbosons_w1.clear()
         quarks.clear()
         radiations.clear()
+        jj.clear()
+        ht.clear()
+        jjl2v2.clear()
+        jjl1v1.clear()
+        mjjll.clear()
+	jjl1.clear()
+	jjl2.clear()
+        v1v2.clear()
         bquarks.clear()
 
         in_ev=0

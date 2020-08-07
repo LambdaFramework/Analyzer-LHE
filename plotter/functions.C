@@ -10,18 +10,65 @@ float deltaPhi(float phi1, float phi2) {
     return 2*3.14159265-PHI;
 }
 
-float deltaR(float phi1, float eta1, float phi2, float eta2) {
-  //return sqrt((eta2-eta1)**2+deltaPhi(phi1,phi2)**2);
-  return sqrt((eta2-eta1)*2+deltaPhi(phi1,phi2)*2);
+float boostToMomPhi(float p1_pt, float p1_eta, float p1_phi, float p1_mass, float p2_pt, float p2_eta, float p2_phi, float p2_mass){
+  TLorentzVector p1; p1.SetPtEtaPhiM(p1_pt, p1_eta, p1_phi, p1_mass);
+  TLorentzVector p2; p2.SetPtEtaPhiM(p2_pt, p2_eta, p2_phi, p2_mass);  //boost to this frame (mother when its moving)
+  TVector3 p3; p3 = p2.BoostVector();
+  p1.Boost(p3);
+  return p1.Phi();
 }
 
-//float DeltaR(TLorentzVector *tlv1, TLorentzVector *tlv2) {
-//  float phi1 = tlv1->Phi();
-//  float phi2 = tlv2->Phi();
-//  float eta1 = tlv1->Eta();
-//  float eta2 = tlv2->Eta();
-//  return deltaR(eta1, phi1, eta2, phi2);
-//}
+float boostToMomTheta(float p1_pt, float p1_eta, float p1_phi, float p1_mass, float p2_pt, float p2_eta, float p2_phi, float p2_mass){
+  TLorentzVector p1; p1.SetPtEtaPhiM(p1_pt, p1_eta, p1_phi, p1_mass);
+  TLorentzVector p2; p2.SetPtEtaPhiM(p2_pt, p2_eta, p2_phi, p2_mass);  //boost to this frame (mother when its moving) 
+  TVector3 p3; p3 = p2.BoostVector();
+  p1.Boost(p3);
+  return p1.Theta();
+}
+
+float boostToMomEta(float p1_pt, float p1_eta, float p1_phi, float p1_mass, float p2_pt, float p2_eta, float p2_phi, float p2_mass){
+  TLorentzVector p1; p1.SetPtEtaPhiM(p1_pt, p1_eta, p1_phi, p1_mass);
+  TLorentzVector p2; p2.SetPtEtaPhiM(p2_pt, p2_eta, p2_phi, p2_mass);  //boost to this frame (mother when its moving)
+  TVector3 p3; p3 = p2.BoostVector();
+  p1.Boost(p3);
+  return p1.Eta();
+}
+
+float boostToMomPt(float p1_pt, float p1_eta, float p1_phi, float p1_mass, float p2_pt, float p2_eta, float p2_phi, float p2_mass){
+  TLorentzVector p1; p1.SetPtEtaPhiM(p1_pt, p1_eta, p1_phi, p1_mass);
+  TLorentzVector p2; p2.SetPtEtaPhiM(p2_pt, p2_eta, p2_phi, p2_mass);  //boost to this frame (mother when its moving) 
+  TVector3 p3; p3 = p2.BoostVector();
+  p1.Boost(p3);
+  return p1.Pt();
+}
+
+
+float deltaR(float phi1, float eta1, float phi2, float eta2) {
+  return sqrt( (eta2-eta1)*(eta2-eta1) + deltaPhi(phi1,phi2)*deltaPhi(phi1,phi2) );
+}
+
+float deltaEta(float eta1 , float eta2){
+  return fabs(eta1-eta2);
+}
+
+float invariantMass(float p1_pt, float p1_eta, float p1_phi, float p1_mass, float p2_pt, float p2_eta, float p2_phi, float p2_mass) {
+  if(p1_pt<0. || p2_pt<0.) return -1.;
+  TLorentzVector p1;
+  TLorentzVector p2;
+  p1.SetPtEtaPhiM(p1_pt, p1_eta, p1_phi, p1_mass);
+  p2.SetPtEtaPhiM(p2_pt, p2_eta, p2_phi, p2_mass);
+  return (p1+p2).M();
+}
+
+float invariantMassPt(float p1_pt, float p1_eta, float p1_phi, float p1_mass, float p2_pt, float p2_eta, float p2_phi, float p2_mass) {
+  if(p1_pt<0. || p2_pt<0.) return -1.;
+  TLorentzVector p1;
+  TLorentzVector p2;
+  p1.SetPtEtaPhiM(p1_pt, p1_eta, p1_phi, p1_mass);
+  p2.SetPtEtaPhiM(p2_pt, p2_eta, p2_phi, p2_mass);
+  return (p1+p2).Pt();
+}
+
 
 float vectorSumPhi(float px1, float py1, float px2, float py2){
   float phi = atan((py1+py2)/(px1+px2));
