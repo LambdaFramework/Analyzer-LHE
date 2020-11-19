@@ -140,7 +140,7 @@ def plot( sample, n, v, sel, hbins, hmin, hmax, hlog, xlabel, ylabel, dim ):
         if not os.path.exists(output):
             os.system('mkdir -p %s' %output)
 
-        c1.Print( output + n + ".pdf")
+        #c1.Print( output + n + ".pdf")
         c1.Print( output + n + ".png")
             
 ###################

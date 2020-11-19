@@ -4,7 +4,7 @@ from tdrstyle import *
 
 NORM2AU=False
  
-Lhefiles=[ 'hwplus_ss_012j.root' ]
+Lhefiles=[ 'hwplus_ss_012j.root' , 'hwminus_ss_012j.root' ]
 
 # variables
 var =[
